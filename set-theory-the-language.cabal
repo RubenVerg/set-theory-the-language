@@ -102,3 +102,18 @@ executable set-theory-the-language
 
     -- Base language which the package is written in.
     default-language: GHC2024
+
+test-suite sttl-tests
+    import:           warnings
+    default-language: GHC2024
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    other-modules:    Language.STTL.ConstructsSpec
+                    , Language.STTL.SetSpec
+    build-depends:    base ^>=4.20.0.0
+                    , set-theory-the-language
+                    , hspec ^>=2.11.7
+                    , hspec-discover ^>=2.11.7
+    build-tool-depends:
+        hspec-discover:hspec-discover >=2.11.7

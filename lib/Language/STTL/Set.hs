@@ -20,7 +20,7 @@ import Data.List
 import Numeric.Natural
 
 -- | A mathematical set, a collection of unique sets.
-data Set = ListSet [Set]
+newtype Set = ListSet [Set]
   deriving (Eq, Ord)
 
 -- | The empty set \(\emptyset\).
