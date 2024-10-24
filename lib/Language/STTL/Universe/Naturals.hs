@@ -6,6 +6,7 @@ module Language.STTL.Universe.Naturals
   ( naturalsChar
   , naturalsParseNumeric
   , naturalsShow
+  , naturalsRead
   , naturalsPlus
   , naturalsTimes
   , naturals
@@ -17,6 +18,7 @@ import Language.STTL.Universe
 import Language.STTL.Context
 
 import Numeric.Natural
+import Text.Read
 
 -- | The character for the naturals universe, @ℕ@.
 naturalsChar :: Char
@@ -29,6 +31,12 @@ naturalsParseNumeric = pure . makeNatural
 -- | Representation of a natural.
 naturalsShow :: Set -> Context String
 naturalsShow = pure . show . setCount
+
+-- | Parsing of a natural.
+naturalsRead :: String -> Context Set
+naturalsRead s = case readMaybe s of
+  Nothing -> throwError $ "Could not parse natural: " ++ s
+  Just n -> pure $ makeNatural n
 
 -- | Addition in the naturals universe
 naturalsPlus :: Set -> Set -> Context Set
@@ -46,5 +54,6 @@ naturals = Universe
   { universeChar = naturalsChar
   , universeParseNumeric = Just naturalsParseNumeric
   , universeShow = Just naturalsShow
+  , universeRead = Just naturalsRead
   , universePlus = Just naturalsPlus
   , universeTimes = Just naturalsTimes }

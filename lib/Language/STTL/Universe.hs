@@ -15,6 +15,7 @@ import Numeric.Natural
 data Universe = Universe
   { universeChar :: Char -- ^ The double-struck character that represents this universe.
   , universeShow :: Maybe (Set -> Context String)
+  , universeRead :: Maybe (String -> Context Set)
   , universeParseNumeric :: Maybe (Natural -> Context Set) -- ^ Parsing a number to this universe.
   , universePlus :: Maybe (Set -> Set -> Context Set) -- ^ Addition in this universe.
   , universeTimes :: Maybe (Set -> Set -> Context Set) -- ^ Multiplication in this universe.

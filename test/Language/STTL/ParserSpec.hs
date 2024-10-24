@@ -8,12 +8,7 @@ import Language.STTL.Context
 spec :: Spec
 spec = do
   let p = runContext . parse "test"
-  let pe code = do {
-      res <- p code
-    ; case res of {
-        Left err -> pure $ Left err
-      ; Right (StmtExpr e) -> pure $ Right e
-      ; Right _ -> pure $ Left "Expected expression" } }
+  let pe = runContext . parseExpr "text"
 
   describe "expressions" $ do
     it "shoud parse empty sets" $ do
@@ -54,4 +49,20 @@ spec = do
     it "should parse number literals" $ do
       pe "1234𝕒" `shouldReturn` pure (ExprNumeric 1234 '𝕒')
       pe "0𝕒" `shouldReturn` pure (ExprNumeric 0 '𝕒')
+    
+    it "should parse get" $ do
+      pe "get" `shouldReturn` pure ExprGet
+
+    it "should parse universal get" $ do
+      pe "get𝕒" `shouldReturn` pure (ExprUniversalGet '𝕒')
+
+  describe "statements" $ do
+    it "should parse expression statements" $ do
+      p "∅∪∅" `shouldReturn` pure (StmtExpr (ExprDyad '∪' ExprEmptySet ExprEmptySet))
+
+    it "should parse print statements" $ do
+      p "print∅" `shouldReturn` pure (StmtPrint ExprEmptySet)
+
+    it "should parse universal print statements" $ do
+      p "print𝕒∅" `shouldReturn` pure (StmtUniversalPrint '𝕒' ExprEmptySet)
 

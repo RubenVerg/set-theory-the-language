@@ -18,6 +18,7 @@ import Language.STTL.Context
 
 import Data.Composition
 import Data.Functor
+import System.IO
 
 withUniverse :: Char -> (Universe -> Context a) -> Context a
 withUniverse u f = case lookup u universes of
@@ -31,6 +32,18 @@ interpretExpr (ExprNumeric n u) = withUniverse u $ \un -> case universeParseNume
   Nothing -> throwError $ "Universe " ++ [u] ++ " does not support numeric literals"
   Just f -> f n
 interpretExpr (ExprSetLiteral xs) = makeSet <$> mapM interpretExpr xs
+interpretExpr ExprGet = do
+  liftIO $ putStr "input> "
+  liftIO $ hFlush stdout
+  l <- liftIO getLine
+  parseExpr "<input>" l >>= interpretExpr
+interpretExpr (ExprUniversalGet u) = withUniverse u $ \un -> case universeRead un of
+  Nothing -> throwError $ "Universe " ++ [u] ++ " does not support reading input"
+  Just f -> do
+    liftIO $ putStr $ "input " ++ [u] ++ "> "
+    liftIO $ hFlush stdout
+    l <- liftIO getLine
+    f l
 interpretExpr (ExprMonad c x)
   | c == G.count = makeNatural . setCount <$> interpretExpr x
   | otherwise = throwError $ "Unknown operator " ++ [c]
