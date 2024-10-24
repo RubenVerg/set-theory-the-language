@@ -42,4 +42,8 @@ spec = do
   it "should parse universal operators" $ do
     p "∅ +𝕒 ∅" `shouldBe` pure (BranchUniversalDyad '+' '𝕒' LeafEmptySet LeafEmptySet)
     p "∅ ×𝕒 ∅" `shouldBe` pure (BranchUniversalDyad '×' '𝕒' LeafEmptySet LeafEmptySet)
-    
+
+  it "should parse number literals" $ do
+    p "1234𝕒" `shouldBe` pure (LeafNumeric 1234 '𝕒')
+    p "0𝕒" `shouldBe` pure (LeafNumeric 0 '𝕒')
+

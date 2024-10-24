@@ -42,6 +42,9 @@ spec = do
     r "∅ +ℕ {∅}" `shouldBe` pure (makeNatural 1)
     r "{∅} ×ℕ {∅, {∅}}" `shouldBe` pure (makeNatural 2)
 
+  it "should evaluate numeric literals" $ do
+    r "12ℕ" `shouldBe` pure (makeNatural 12)
+
   it "should fail with invalid inputs" $ do
     i (BranchMonad '?' LeafEmptySet) `shouldSatisfy` isLeft
     i (BranchDyad '?' LeafEmptySet LeafEmptySet) `shouldSatisfy` isLeft
