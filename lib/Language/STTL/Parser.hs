@@ -2,11 +2,13 @@
 --
 -- Parser for Set Theory: The Language.
 module Language.STTL.Parser
-  ( AST(..)
+  ( Expr(..)
+  , Stmt(..)
   , Language.STTL.Parser.parse
   ) where
 
 import qualified Language.STTL.Glyphs as G
+import Language.STTL.Context
 
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -17,17 +19,23 @@ import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Bifunctor
 import Control.Monad.Combinators.Expr
 import Numeric.Natural
+import Data.Composition
 
--- | Abstract syntax tree.
-data AST
-  = LeafEmptySet
-  | LeafNumeric Natural Char
-  | BranchSetLiteral [AST]
-  | BranchMonad Char AST
-  | BranchDyad Char AST AST
-  | BranchUniversalMonad Char Char AST
-  | BranchUniversalDyad Char Char AST AST
+-- | Expression abstract syntax tree.
+data Expr
+  = ExprEmptySet
+  | ExprNumeric Natural Char
+  | ExprSetLiteral [Expr]
+  | ExprMonad Char Expr
+  | ExprDyad Char Expr Expr
+  | ExprUniversalMonad Char Char Expr
+  | ExprUniversalDyad Char Char Expr Expr
   deriving (Eq, Show)
+
+data Stmt
+  = StmtExpr Expr
+  | StmtPrint Expr
+  | StmtUniversalPrint Char Expr
 
 type Parser = Parsec Void String
 
@@ -43,19 +51,19 @@ lexeme = L.lexeme spaceConsumer
 universe :: Parser Char
 universe = oneOf G.double
 
-emptySet :: Parser AST
-emptySet = lexeme $ char G.emptySet $> LeafEmptySet
+emptySet :: Parser Expr
+emptySet = lexeme $ char G.emptySet $> ExprEmptySet
 
-setLiteral :: Parser AST
-setLiteral = lexeme $ between (lexeme $ char G.setOpen) (lexeme $ char G.setClose) (BranchSetLiteral <$> sepBy expression (lexeme $ char G.elementSeparator))
+setLiteral :: Parser Expr
+setLiteral = lexeme $ between (lexeme $ char G.setOpen) (lexeme $ char G.setClose) (ExprSetLiteral <$> sepBy expression (lexeme $ char G.elementSeparator))
 
-numericLiteral :: Parser AST
-numericLiteral = lexeme (commitOn (LeafNumeric . read) (some digitChar) universe <?> "numeric literal")
+numericLiteral :: Parser Expr
+numericLiteral = lexeme (commitOn (ExprNumeric . read) (some digitChar) universe <?> "numeric literal")
 
-term :: Parser AST
+term :: Parser Expr
 term = emptySet <|> setLiteral <|> numericLiteral <|> between (lexeme $ char G.groupLeft) (lexeme $ char G.groupRight) expression
 
-expression :: Parser AST
+expression :: Parser Expr
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   [ [ monad G.count ]
   , [ dyadUL G.cartesianProduct ]
@@ -68,13 +76,22 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   , [ dyadN G.pair ]
   ]
   where
-    monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> BranchMonad c)
-    dyadL c = InfixL $ lexeme $ char c $> BranchDyad c
-    dyadN c = InfixN $ lexeme $ char c $> BranchDyad c
-    dyadUL c = InfixL $ lexeme $ (commitOn BranchUniversalDyad (char c) universe <?> [c] ++ "universe")
+    monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> ExprMonad c)
+    dyadL c = InfixL $ lexeme $ char c $> ExprDyad c
+    dyadN c = InfixN $ lexeme $ char c $> ExprDyad c
+    dyadUL c = InfixL $ lexeme $ (commitOn ExprUniversalDyad (char c) universe <?> [c] ++ "universe")
 
--- |  Parse code into an 'AST'.
-parse :: FilePath -> String -> Either String AST
+universalPrintStatement :: Parser Stmt
+universalPrintStatement = lexeme $ commitOn (StmtUniversalPrint .: flip const) (string "print") universe <*> expression
+
+printStatement :: Parser Stmt
+printStatement = lexeme $ string "print" $> StmtPrint <*> expression
+
+statement :: Parser Stmt
+statement = universalPrintStatement <|> printStatement <|> (StmtExpr <$> expression)
+
+-- |  Parse code into an 'Expr'.
+parse :: FilePath -> String -> Context Stmt
 parse file source = let
   prettyError :: SourcePos -> String
   prettyError pos = let
@@ -90,4 +107,6 @@ parse file source = let
   makeParseErrors :: ParseErrorBundle String Void -> String
   makeParseErrors es = case attachSourcePos errorOffset (bundleErrors es) (bundlePosState es) of
     (r :| rs, _) -> concatMap (uncurry $ flip prettyParseError) $ r : rs
-  in first makeParseErrors $ Text.Megaparsec.parse (expression <* eof) file source
+  in case first makeParseErrors $ Text.Megaparsec.parse (statement <* eof) file source of
+    Left err -> throwError err
+    Right s -> pure s

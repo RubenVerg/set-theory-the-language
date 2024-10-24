@@ -1,6 +1,8 @@
 module Main where
 
 import Language.STTL.Interpreter
+import Language.STTL.Context
+
 import System.IO
 
 repl :: IO ()
@@ -9,9 +11,10 @@ repl = do
   hFlush stdout
   line <- getLine
   if line == ":q" then return ()
-  else (putStrLn $ case run "<repl>" line of
+  else runContext (run "<repl>" line) >>= putStrLn . (\case
     Left err -> err
-    Right ast -> show ast) >> repl
+    Right Nothing -> ""
+    Right (Just v) -> show v) >> repl
 
 main :: IO ()
 main = do
