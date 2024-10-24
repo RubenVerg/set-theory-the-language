@@ -67,6 +67,7 @@ interpretExpr (ExprUniversalDyad c u x y) = withUniverse u $ \un -> let
     f x' y'
   in case c of
     _ | c == G.plus -> evalOrNot $ universePlus un
+    _ | c == G.minus -> evalOrNot $ universeMinus un
     _ | c == G.cartesianProduct -> evalOrNot $ universeTimes un
     _ -> throwError $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
 

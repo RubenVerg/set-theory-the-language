@@ -42,6 +42,7 @@ contains = '∋'
 cartesianProduct = '×'
 pair = ';'
 plus = '+'
+minus = '-'
 
 dyads =
   [ union
@@ -54,6 +55,7 @@ dyads =
   , cartesianProduct
   , pair
   , plus
+  , minus
   ]
 
 upperDouble = "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"

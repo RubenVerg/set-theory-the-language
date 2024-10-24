@@ -80,7 +80,7 @@ expression :: Parser Expr
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   [ [ monad G.count ]
   , [ dyadUL G.cartesianProduct ]
-  , [ dyadUL G.plus ]
+  , [ dyadUL G.plus, dyadUL G.minus ]
   , [ dyadL G.difference ]
   , [ dyadL G.intersection ]
   , [ dyadL G.union ]

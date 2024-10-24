@@ -42,9 +42,11 @@ spec = do
   it "should evaluate universal dyads" $ do
     r "∅ +ℕ {∅}" `shouldReturn` pure (Just $ makeNatural 1)
     r "{∅} ×ℕ {∅, {∅}}" `shouldReturn` pure (Just $ makeNatural 2)
+    r "5ℤ -ℤ 0ℤ" `shouldReturn` pure (Just $ makeInteger 5)
 
   it "should evaluate numeric literals" $ do
     r "12ℕ" `shouldReturn` pure (Just $ makeNatural 12)
+    r "¯5ℤ" `shouldReturn` pure (Just $ makeInteger (-5))
 
   it "should fail with invalid inputs" $ do
     i (StmtExpr $ ExprMonad '?' ExprEmptySet) >>= (`shouldSatisfy` isLeft)
