@@ -16,10 +16,12 @@ import Data.Functor
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Bifunctor
 import Control.Monad.Combinators.Expr
+import Numeric.Natural
 
 -- | Abstract syntax tree.
 data AST
   = LeafEmptySet
+  | LeafNumeric Natural Char
   | BranchSetLiteral [AST]
   | BranchMonad Char AST
   | BranchDyad Char AST AST
@@ -28,6 +30,9 @@ data AST
   deriving (Eq, Show)
 
 type Parser = Parsec Void String
+
+commitOn :: (a -> b -> c) -> Parser a -> Parser b -> Parser c
+commitOn f p q = liftA2 f (try $ p <* lookAhead q) q
 
 spaceConsumer :: Parser ()
 spaceConsumer = L.space space1 (L.skipLineComment [G.comment]) empty
@@ -44,8 +49,11 @@ emptySet = lexeme $ char G.emptySet $> LeafEmptySet
 setLiteral :: Parser AST
 setLiteral = lexeme $ between (lexeme $ char G.setOpen) (lexeme $ char G.setClose) (BranchSetLiteral <$> sepBy expression (lexeme $ char G.elementSeparator))
 
+numericLiteral :: Parser AST
+numericLiteral = lexeme (commitOn (LeafNumeric . read) (some digitChar) universe <?> "numeric literal")
+
 term :: Parser AST
-term = emptySet <|> setLiteral <|> between (lexeme $ char G.groupLeft) (lexeme $ char G.groupRight) expression
+term = emptySet <|> setLiteral <|> numericLiteral <|> between (lexeme $ char G.groupLeft) (lexeme $ char G.groupRight) expression
 
 expression :: Parser AST
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
@@ -63,7 +71,7 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
     monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> BranchMonad c)
     dyadL c = InfixL $ lexeme $ char c $> BranchDyad c
     dyadN c = InfixN $ lexeme $ char c $> BranchDyad c
-    dyadUL c = InfixL $ lexeme $ try (char c *> universe) <&> BranchUniversalDyad c
+    dyadUL c = InfixL $ lexeme $ (commitOn BranchUniversalDyad (char c) universe <?> [c] ++ "universe")
 
 -- |  Parse code into an 'AST'.
 parse :: FilePath -> String -> Either String AST
