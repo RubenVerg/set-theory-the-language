@@ -61,10 +61,13 @@ library
 
     -- Modules exported by the library.
     exposed-modules:  Language.STTL.Constructs
+                    , Language.STTL.DefaultUniverses
                     , Language.STTL.Glyphs
                     , Language.STTL.Interpreter
                     , Language.STTL.Parser
                     , Language.STTL.Set
+                    , Language.STTL.Universe
+                    , Language.STTL.Universe.Naturals
 
     -- Modules included in this library but not exported.
     -- other-modules:

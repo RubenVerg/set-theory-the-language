@@ -11,6 +11,8 @@ import qualified Language.STTL.Glyphs as G
 import Language.STTL.Parser
 import Language.STTL.Set
 import Language.STTL.Constructs
+import Language.STTL.Universe
+import Language.STTL.DefaultUniverses
 
 import Data.Composition
 
@@ -32,6 +34,19 @@ interpret (BranchDyad c x y)
   | c == G.contains = makeBoolean .: setContains <$> interpret x <*> interpret y
   | c == G.pair = curry makePair <$> interpret x <*> interpret y
   | otherwise = Left $ "Unknown operator " ++ [c]
+interpret (BranchUniversalMonad c u _) = Left $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
+interpret (BranchUniversalDyad c u x y) = case lookup u universes of
+   Nothing -> Left $ "Universe " ++ [u] ++ " does not exist"
+   Just un -> let
+    evalOrNot Nothing = Left $ "Universe " ++ [u] ++ " does not support operation " ++ [c]
+    evalOrNot (Just f) = do
+      x' <- interpret x
+      y' <- interpret y
+      f x' y'
+    in case c of
+      _ | c == G.plus -> evalOrNot $ universePlus un
+      _ | c == G.cartesianProduct -> evalOrNot $ universeTimes un
+      _ -> Left $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
 
 -- | Parse and interpret in a single function.
 run :: FilePath -> String -> Either String Set

@@ -23,6 +23,8 @@ data AST
   | BranchSetLiteral [AST]
   | BranchMonad Char AST
   | BranchDyad Char AST AST
+  | BranchUniversalMonad Char Char AST
+  | BranchUniversalDyad Char Char AST AST
   deriving (Eq, Show)
 
 type Parser = Parsec Void String
@@ -32,6 +34,9 @@ spaceConsumer = L.space space1 (L.skipLineComment [G.comment]) empty
 
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme spaceConsumer
+
+universe :: Parser Char
+universe = oneOf G.double
 
 emptySet :: Parser AST
 emptySet = lexeme $ char G.emptySet $> LeafEmptySet
@@ -45,6 +50,8 @@ term = emptySet <|> setLiteral <|> between (lexeme $ char G.groupLeft) (lexeme $
 expression :: Parser AST
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   [ [ monad G.count ]
+  , [ dyadUL G.cartesianProduct ]
+  , [ dyadUL G.plus ]
   , [ dyadL G.difference ]
   , [ dyadL G.intersection ]
   , [ dyadL G.union ]
@@ -56,6 +63,7 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
     monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> BranchMonad c)
     dyadL c = InfixL $ lexeme $ char c $> BranchDyad c
     dyadN c = InfixN $ lexeme $ char c $> BranchDyad c
+    dyadUL c = InfixL $ lexeme $ try (char c *> universe) <&> BranchUniversalDyad c
 
 -- |  Parse code into an 'AST'.
 parse :: FilePath -> String -> Either String AST
