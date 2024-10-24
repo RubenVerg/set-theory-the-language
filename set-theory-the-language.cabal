@@ -114,6 +114,8 @@ test-suite sttl-tests
     hs-source-dirs:   test
     main-is:          Main.hs
     other-modules:    Language.STTL.ConstructsSpec
+                    , Language.STTL.InterpreterSpec
+                    , Language.STTL.ParserSpec
                     , Language.STTL.SetSpec
     build-depends:    base ^>=4.20.0.0
                     , set-theory-the-language
