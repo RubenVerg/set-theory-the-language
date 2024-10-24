@@ -1,12 +1,22 @@
 module Main where
 
-import Language.STTL.Constructs
-import Language.STTL.Set
+import Language.STTL.Interpreter
+import System.IO
+
+repl :: IO ()
+repl = do
+  putStr "> "
+  hFlush stdout
+  line <- getLine
+  if line == ":q" then return ()
+  else (putStrLn $ case run "<repl>" line of
+    Left err -> err
+    Right ast -> show ast) >> repl
 
 main :: IO ()
 main = do
-  print emptySet
-  print $ makeSet [emptySet, emptySet]
-  print $ makeSet [emptySet, makeSet [emptySet]]
-  print $ makeNatural 5
-  print $ makePair (makeNatural 2, makeNatural 3)
+  hSetEncoding stdin utf8
+  hSetEncoding stdout utf8
+  hSetEncoding stderr utf8
+
+  repl

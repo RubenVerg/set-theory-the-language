@@ -2,14 +2,20 @@
 
 module Language.STTL.Glyphs where
 
+comment = '\''
 setOpen = '{'
 setClose = '}'
 elementSeparator = ','
+groupLeft = '('
+groupRight = ')'
 
 syntax =
-  [ setOpen
+  [ comment
+  , setOpen
   , setClose
   , elementSeparator
+  , groupLeft
+  , groupRight
   ]
 
 emptySet = '∅'
