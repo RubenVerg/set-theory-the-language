@@ -49,6 +49,7 @@ spec = do
     it "should parse number literals" $ do
       pe "1234𝕒" `shouldReturn` pure (ExprNumeric 1234 '𝕒')
       pe "0𝕒" `shouldReturn` pure (ExprNumeric 0 '𝕒')
+      pe "¯5𝕒" `shouldReturn` pure (ExprNumeric (-5) '𝕒')
     
     it "should parse get" $ do
       pe "get" `shouldReturn` pure ExprGet

@@ -9,14 +9,13 @@ module Language.STTL.Universe
 import Language.STTL.Set
 import Language.STTL.Context
 
-import Numeric.Natural
-
 -- | Collection of operations in a certain context
 data Universe = Universe
   { universeChar :: Char -- ^ The double-struck character that represents this universe.
   , universeShow :: Maybe (Set -> Context String)
   , universeRead :: Maybe (String -> Context Set)
-  , universeParseNumeric :: Maybe (Natural -> Context Set) -- ^ Parsing a number to this universe.
+  , universeParseNumeric :: Maybe (Integer -> Context Set) -- ^ Parsing a number to this universe.
   , universePlus :: Maybe (Set -> Set -> Context Set) -- ^ Addition in this universe.
+  , universeMinus :: Maybe (Set -> Set -> Context Set) -- ^ Subtraction in this universe.
   , universeTimes :: Maybe (Set -> Set -> Context Set) -- ^ Multiplication in this universe.
   }

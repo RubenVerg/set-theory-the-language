@@ -17,7 +17,6 @@ import Language.STTL.Set
 import Language.STTL.Universe
 import Language.STTL.Context
 
-import Numeric.Natural
 import Text.Read
 
 -- | The character for the naturals universe, @ℕ@.
@@ -25,8 +24,10 @@ naturalsChar :: Char
 naturalsChar = 'ℕ'
 
 -- | Turn a natural into a set.
-naturalsParseNumeric :: Natural -> Context Set
-naturalsParseNumeric = pure . makeNatural
+naturalsParseNumeric :: Integer -> Context Set
+naturalsParseNumeric n
+  | n >= 0 = pure $ makeNatural $ fromInteger n
+  | otherwise = throwError "Cannot parse negative number to natural"
 
 -- | Representation of a natural.
 naturalsShow :: Set -> Context String
@@ -48,7 +49,7 @@ naturalsTimes a b = pure $ makeNatural $ unNatural a * unNatural b
 
 -- | The natural numbers universe.
 --
--- Supports @+@ and @×@.
+-- Supports parsing numbers, showing, reading, @+@ and @×@.
 naturals :: Universe
 naturals = Universe
   { universeChar = naturalsChar
@@ -56,4 +57,5 @@ naturals = Universe
   , universeShow = Just naturalsShow
   , universeRead = Just naturalsRead
   , universePlus = Just naturalsPlus
+  , universeMinus = Nothing
   , universeTimes = Just naturalsTimes }

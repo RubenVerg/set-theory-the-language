@@ -8,6 +8,7 @@ setClose = '}'
 elementSeparator = ','
 groupLeft = '('
 groupRight = ')'
+highMinus = '¯'
 
 syntax =
   [ comment
@@ -16,6 +17,7 @@ syntax =
   , elementSeparator
   , groupLeft
   , groupRight
+  , highMinus
   ]
 
 emptySet = '∅'

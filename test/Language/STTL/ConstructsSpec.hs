@@ -75,6 +75,19 @@ spec = do
         unNatural (makeNatural 1) `shouldBe` 1
         unNatural (makeNatural 5) `shouldBe` 5
 
+  describe "integers" $ do
+    describe "makeInteger" $ do
+      it "should make an integer" $ do
+        makeInteger 2 `shouldBe` makePair (makeNatural 2, makeNatural 0)
+        makeInteger (-2) `shouldBe` makePair (makeNatural 0, makeNatural 2)
+        makeInteger 0 `shouldBe` makePair (makeNatural 0, makeNatural 0)
+
+    describe "unInteger" $ do
+      it "should return the value of an integer" $ do
+        unInteger (makeInteger 0) `shouldBe` Just 0
+        unInteger (makeInteger 10) `shouldBe` Just 10
+        unInteger (makeInteger (-7)) `shouldBe` Just (-7)
+
   describe "booleans" $ do
     describe "booleanFalse" $ do
       it "should be the empty set" $ do

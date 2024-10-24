@@ -19,13 +19,12 @@ import Data.Functor
 import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Bifunctor
 import Control.Monad.Combinators.Expr
-import Numeric.Natural
 import Data.Composition
 
 -- | Expression abstract syntax tree.
 data Expr
   = ExprEmptySet
-  | ExprNumeric Natural Char
+  | ExprNumeric Integer Char
   | ExprGet
   | ExprUniversalGet Char
   | ExprSetLiteral [Expr]
@@ -63,7 +62,10 @@ setLiteral :: Parser Expr
 setLiteral = lexeme $ between (lexeme $ char G.setOpen) (lexeme $ char G.setClose) (ExprSetLiteral <$> sepBy expression (lexeme $ char G.elementSeparator))
 
 numericLiteral :: Parser Expr
-numericLiteral = lexeme (commitOn (ExprNumeric . read) (some digitChar) universe <?> "numeric literal")
+numericLiteral = lexeme (commitOn (ExprNumeric) (do
+  sign <- choice [char G.highMinus $> (-1), pure 1]
+  digs <- some digitChar
+  pure $ sign * read digs) universe <?> "numeric literal")
 
 universalGet :: Parser Expr
 universalGet = lexeme (commitOn (ExprUniversalGet .: flip const) (string "get") universe <?> "get𝕦")

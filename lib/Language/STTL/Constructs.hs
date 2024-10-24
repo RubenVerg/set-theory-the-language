@@ -26,6 +26,11 @@ module Language.STTL.Constructs
   , unNatural
   , naturalZero
   , naturalSucc
+    -- * Integers
+    --
+    -- | Integers are represented as pairs of natural numbers, where the first element is the "positive" part and the second element is the "negative" part.
+  , makeInteger
+  , unInteger
     -- * Booleans
     --
     -- | @False@ is represented as \(\emptyset\) and @True@ as \(\{\emptyset\}\).
@@ -80,7 +85,7 @@ makeNatural :: Natural -> Set
 makeNatural 0 = naturalZero
 makeNatural n = naturalSucc $ makeNatural $ n - 1
 
--- | Extract the value of a natural number.Set
+-- | Extract the value of a natural number Set.
 -- This is very lax, accepting any set, and just returns its length.
 unNatural :: Set -> Natural
 unNatural = setCount
@@ -92,6 +97,18 @@ naturalZero = emptySet
 -- | The natural representing \(n + 1\).
 naturalSucc :: Set -> Set
 naturalSucc n = setUnion n $ setSingleton n
+
+-- | Construct a 'Set' integer from an 'Integer'.
+makeInteger :: Integer -> Set
+makeInteger n | n > 0 = makePair (makeNatural $ fromIntegral n, naturalZero)
+              | n < 0 = makePair (naturalZero, makeNatural $ fromIntegral $ negate n)
+              | otherwise = makePair (naturalZero, naturalZero)
+
+-- | Extract the value of an integer Set.
+unInteger :: Set -> Maybe Integer
+unInteger s = do
+  (p, n) <- unPair s
+  pure $ toInteger (unNatural p) - toInteger (unNatural n)
 
 -- | Turn a boolean into its set representation.
 makeBoolean :: Bool -> Set
