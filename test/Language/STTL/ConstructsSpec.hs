@@ -47,6 +47,10 @@ spec = do
         pairSnd (makePair (emptySet, emptySet)) `shouldBe` Just emptySet
         pairSnd emptySet `shouldBe` Nothing
 
+    describe "cartesianProduct" $ do
+      it "should return the cartesian product of two sets" $ do
+        cartesianProduct (makeNatural 1) (makeNatural 2) `shouldBe` makeSet [makePair (emptySet, emptySet), makePair (emptySet, setSingleton emptySet)]
+
   describe "naturals" $ do
     describe "naturalZero" $ do
       it "should be the empty set" $ do
@@ -70,3 +74,24 @@ spec = do
         unNatural naturalZero `shouldBe` 0
         unNatural (makeNatural 1) `shouldBe` 1
         unNatural (makeNatural 5) `shouldBe` 5
+
+  describe "booleans" $ do
+    describe "booleanFalse" $ do
+      it "should be the empty set" $ do
+        booleanFalse `shouldBe` emptySet
+
+    describe "booleanTrue" $ do
+      it "should be a singleton of the empty set" $ do
+        booleanTrue `shouldBe` setSingleton emptySet
+
+    describe "makeBoolean" $ do
+      it "should make a boolean" $ do
+        makeBoolean False `shouldBe` booleanFalse
+        makeBoolean True `shouldBe` booleanTrue
+
+    describe "unBoolean" $ do
+      it "turns empty sets into False" $ do
+        unBoolean emptySet `shouldBe` False
+      it "turns all other sets into True" $ do
+        unBoolean booleanTrue `shouldBe` True
+        unBoolean (makeNatural 4) `shouldBe` True

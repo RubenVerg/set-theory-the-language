@@ -2,6 +2,7 @@ module Language.STTL.SetSpec where
 
 import Test.Hspec
 
+import Language.STTL.Constructs
 import Language.STTL.Set
 
 spec :: Spec
@@ -52,6 +53,30 @@ spec = do
       setDifference (setSingleton emptySet) emptySet `shouldBe` setSingleton emptySet
       setDifference (makeSet [emptySet, setSingleton emptySet]) (makeSet [emptySet, setSingleton (setSingleton emptySet)])
         `shouldBe` makeSet [setSingleton emptySet]
+
+  describe "setSubset" $ do
+    it "should check whether a set is a subset of another" $ do
+      setSubset (setSingleton emptySet) (makeNatural 5) `shouldBe` True
+      setSubset (setSingleton emptySet) emptySet `shouldBe` False
+    it "should say that the empty set is a subset of all sets" $ do
+      setSubset emptySet (makeNatural 5) `shouldBe` True
+
+  describe "setSuperset" $ do
+    it "should check whether a set is a superset of another" $ do
+      setSuperset (makeNatural 5) (setSingleton emptySet) `shouldBe` True
+      setSuperset emptySet (setSingleton emptySet) `shouldBe` False
+    it "should say that all sets are supersets of the empty set" $ do
+      setSuperset (makeNatural 5) emptySet `shouldBe` True
+
+  describe "setElement" $ do
+    it "should check whether a set contains an element" $ do
+      setElement (setSingleton emptySet) emptySet `shouldBe` False
+      setElement (setSingleton emptySet) (makeNatural 5) `shouldBe` True
+
+  describe "setContains" $ do
+    it "should check whether a set contains another" $ do
+      setContains emptySet (setSingleton emptySet) `shouldBe` False
+      setContains (makeNatural 5) (setSingleton emptySet) `shouldBe` True
 
   describe "instance Eq Set" $ do
     it "should compare equal sets equal" $ do
