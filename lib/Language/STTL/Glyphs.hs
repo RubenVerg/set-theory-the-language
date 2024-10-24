@@ -33,11 +33,23 @@ monads =
 union = '∪'
 intersection = '∩'
 difference = '∖'
+subset = '⊆'
+superset = '⊇'
+element = '∈'
+contains = '∋'
+cartesianProduct = '×'
+pair = ';'
 
 dyads =
   [ union
   , intersection
   , difference
+  , subset
+  , superset
+  , element
+  , contains
+  , cartesianProduct
+  , pair
   ]
 
 upperDouble = "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"

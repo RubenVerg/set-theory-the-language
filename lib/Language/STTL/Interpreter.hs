@@ -12,16 +12,26 @@ import Language.STTL.Parser
 import Language.STTL.Set
 import Language.STTL.Constructs
 
+import Data.Composition
+
 -- | Interpret an 'AST'.
 interpret :: AST -> Either String Set
 interpret LeafEmptySet = pure emptySet
 interpret (BranchSetLiteral xs) = makeSet <$> mapM interpret xs
-interpret (BranchMonad c x) | c == G.count = makeNatural . setCount <$> interpret x
-                            | otherwise = Left $ "Unknown operator " ++ [c]
-interpret (BranchDyad c x y) | c == G.union = setUnion <$> interpret x <*> interpret y
-                             | c == G.intersection = setIntersection <$> interpret x <*> interpret y
-                             | c == G.difference = setDifference <$> interpret x <*> interpret y
-                             | otherwise = Left $ "Unknown operator " ++ [c]
+interpret (BranchMonad c x)
+  | c == G.count = makeNatural . setCount <$> interpret x
+  | otherwise = Left $ "Unknown operator " ++ [c]
+interpret (BranchDyad c x y)
+  | c == G.union = setUnion <$> interpret x <*> interpret y
+  | c == G.intersection = setIntersection <$> interpret x <*> interpret y
+  | c == G.difference = setDifference <$> interpret x <*> interpret y
+  | c == G.cartesianProduct = cartesianProduct <$> interpret x <*> interpret y
+  | c == G.subset = makeBoolean .: setSubset <$> interpret x <*> interpret y
+  | c == G.superset = makeBoolean .: setSuperset <$> interpret x <*> interpret y
+  | c == G.element = makeBoolean .: setElement <$> interpret x <*> interpret y
+  | c == G.contains = makeBoolean .: setContains <$> interpret x <*> interpret y
+  | c == G.pair = curry makePair <$> interpret x <*> interpret y
+  | otherwise = Left $ "Unknown operator " ++ [c]
 
 -- | Parse and interpret in a single function.
 run :: FilePath -> String -> Either String Set

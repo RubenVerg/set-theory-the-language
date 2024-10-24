@@ -12,6 +12,10 @@ module Language.STTL.Set
   , setUnion
   , setIntersection
   , setDifference
+  , setSubset
+  , setSuperset
+  , setElement
+  , setContains
   ) where
 
 import qualified Language.STTL.Glyphs as G
@@ -60,3 +64,19 @@ setIntersection (ListSet a) (ListSet b) = ListSet $ intersect a b
 -- | The difference of two sets: a set containing all elements that are in the first set but not in the second set: \(a \setminus b\).
 setDifference :: Set -> Set -> Set
 setDifference (ListSet a) (ListSet b) = ListSet $ a \\ b
+
+-- | Is a set a subset of another: are all its items part of another set? \(a \subseteq b\)
+setSubset :: Set -> Set -> Bool
+setSubset (ListSet a) (ListSet b) = all (`elem` b) a
+
+-- | Flipped version of 'setSubset: \(a \suberseteq b\)'.
+setSuperset :: Set -> Set -> Bool
+setSuperset = flip setSubset
+
+-- | Is a set contained as an epement of another? \(a \in b\)
+setElement :: Set -> Set -> Bool
+setElement a (ListSet b) = any (== a) b
+
+-- | Flipped version of 'setElement': \(a \ni b\)
+setContains :: Set -> Set -> Bool
+setContains = flip setElement

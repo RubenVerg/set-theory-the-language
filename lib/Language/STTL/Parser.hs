@@ -45,13 +45,17 @@ term = emptySet <|> setLiteral <|> between (lexeme $ char G.groupLeft) (lexeme $
 expression :: Parser AST
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   [ [ monad G.count ]
-  , [ dyad G.difference ]
-  , [ dyad G.intersection ]
-  , [ dyad G.union ]
+  , [ dyadL G.difference ]
+  , [ dyadL G.intersection ]
+  , [ dyadL G.union ]
+  , [ dyadL G.cartesianProduct ]
+  , [ dyadN G.subset, dyadN G.superset, dyadN G.element, dyadN G.contains ]
+  , [ dyadN G.pair ]
   ]
   where
     monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> BranchMonad c)
-    dyad c = InfixL $ lexeme $ char c $> BranchDyad c
+    dyadL c = InfixL $ lexeme $ char c $> BranchDyad c
+    dyadN c = InfixN $ lexeme $ char c $> BranchDyad c
 
 -- |  Parse code into an 'AST'.
 parse :: FilePath -> String -> Either String AST

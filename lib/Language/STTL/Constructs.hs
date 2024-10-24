@@ -15,6 +15,7 @@ module Language.STTL.Constructs
   , isPair
   , pairFst
   , pairSnd
+  , cartesianProduct
     -- * Naturals
     --
     -- | Natural numbers are represented recursively:
@@ -25,6 +26,13 @@ module Language.STTL.Constructs
   , unNatural
   , naturalZero
   , naturalSucc
+    -- * Booleans
+    --
+    -- | @False@ is represented as \(\emptyset\) and @True@ as \(\{\emptyset\}\).
+  , makeBoolean
+  , unBoolean
+  , booleanFalse
+  , booleanTrue
   ) where
 
 import Language.STTL.Set
@@ -58,6 +66,15 @@ pairFst = fmap fst . unPair
 pairSnd :: Set -> Maybe Set
 pairSnd = fmap snd . unPair
 
+-- | Cartesian product of two sets: \(a \times b\) where
+--
+-- \[ A \times B = \{ (a, b) | a \in A, b \in B \} \]
+cartesianProduct :: Set -> Set -> Set
+cartesianProduct x y = let (xs, ys) = (unSet x, unSet y) in makeSet $ do
+  x' <- xs
+  y' <- ys
+  pure $ makePair (x', y')
+
 -- | Construct a 'Set' natural number from a 'Natural'.
 makeNatural :: Natural -> Set
 makeNatural 0 = naturalZero
@@ -75,3 +92,20 @@ naturalZero = emptySet
 -- | The natural representing \(n + 1\).
 naturalSucc :: Set -> Set
 naturalSucc n = setUnion n $ setSingleton n
+
+-- | Turn a boolean into its set representation.
+makeBoolean :: Bool -> Set
+makeBoolean False = booleanFalse
+makeBoolean True = booleanTrue
+
+-- | Convert empty sets to @False@ and everything else to @True@.
+unBoolean :: Set -> Bool
+unBoolean s = if s == emptySet then False else True
+
+-- | The boolean representing @False@.
+booleanFalse :: Set
+booleanFalse = emptySet
+
+-- | The boolean representing @True@.
+booleanTrue :: Set
+booleanTrue = setSingleton emptySet
