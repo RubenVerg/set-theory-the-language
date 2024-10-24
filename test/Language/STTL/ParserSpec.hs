@@ -21,6 +21,12 @@ spec = do
     p "∅ ∪ ∅" `shouldBe` pure (BranchDyad '∪' LeafEmptySet LeafEmptySet)
     p "∅ ∩ ∅" `shouldBe` pure (BranchDyad '∩' LeafEmptySet LeafEmptySet)
     p "∅ ∖ ∅" `shouldBe` pure (BranchDyad '∖' LeafEmptySet LeafEmptySet)
+    p "∅ × ∅" `shouldBe` pure (BranchDyad '×' LeafEmptySet LeafEmptySet)
+    p "∅ ⊆ ∅" `shouldBe` pure (BranchDyad '⊆' LeafEmptySet LeafEmptySet)
+    p "∅ ⊇ ∅" `shouldBe` pure (BranchDyad '⊇' LeafEmptySet LeafEmptySet)
+    p "∅ ∈ ∅" `shouldBe` pure (BranchDyad '∈' LeafEmptySet LeafEmptySet)
+    p "∅ ∋ ∅" `shouldBe` pure (BranchDyad '∋' LeafEmptySet LeafEmptySet)
+    p "∅ ; ∅" `shouldBe` pure (BranchDyad ';' LeafEmptySet LeafEmptySet)
 
   it "should respect operator precedence" $ do
     p "∅ ∪ ∅ ∩ ∅" `shouldBe` pure (BranchDyad '∪' LeafEmptySet (BranchDyad '∩' LeafEmptySet LeafEmptySet))
@@ -32,4 +38,8 @@ spec = do
 
   it "should parse parentheses" $ do
     p "(∅)" `shouldBe` pure LeafEmptySet
+
+  it "should parse universal operators" $ do
+    p "∅ +𝕒 ∅" `shouldBe` pure (BranchUniversalDyad '+' '𝕒' LeafEmptySet LeafEmptySet)
+    p "∅ ×𝕒 ∅" `shouldBe` pure (BranchUniversalDyad '×' '𝕒' LeafEmptySet LeafEmptySet)
     

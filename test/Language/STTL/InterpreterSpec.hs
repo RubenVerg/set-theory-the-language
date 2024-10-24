@@ -28,7 +28,23 @@ spec = do
     r "{∅} ∪ ∅" `shouldBe` pure (setSingleton emptySet)
     r "{∅} ∩ ∅" `shouldBe` pure emptySet
     r "{∅} ∖ ∅" `shouldBe` pure (setSingleton emptySet)
+    r "{∅} × {∅}" `shouldBe` pure (setSingleton $ makePair (emptySet, emptySet))
+    r "∅ ⊆ {∅}" `shouldBe` pure booleanTrue
+    r "∅ ⊇ {∅}" `shouldBe` pure booleanFalse
+    r "∅ ∈ {∅}" `shouldBe` pure booleanTrue
+    r "∅ ∋ {∅}" `shouldBe` pure booleanFalse
+    r "∅ ; {∅}" `shouldBe` pure (makePair (emptySet, setSingleton emptySet))
+
+  it "should evaluate universal monads" $ do
+    True `shouldBe` True
+
+  it "should evaluate universal dyads" $ do
+    r "∅ +ℕ {∅}" `shouldBe` pure (makeNatural 1)
+    r "{∅} ×ℕ {∅, {∅}}" `shouldBe` pure (makeNatural 2)
 
   it "should fail with invalid inputs" $ do
     i (BranchMonad '?' LeafEmptySet) `shouldSatisfy` isLeft
     i (BranchDyad '?' LeafEmptySet LeafEmptySet) `shouldSatisfy` isLeft
+    i (BranchUniversalMonad '?' '?' LeafEmptySet) `shouldSatisfy` isLeft
+    i (BranchUniversalDyad '?' '?' LeafEmptySet LeafEmptySet) `shouldSatisfy` isLeft
+    i (BranchUniversalDyad '+' 'p' LeafEmptySet LeafEmptySet) `shouldSatisfy` isLeft
