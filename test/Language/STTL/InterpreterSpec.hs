@@ -44,6 +44,10 @@ spec = do
     r "{∅} ×ℕ {∅, {∅}}" `shouldReturn` pure (Just $ makeNatural 2)
     r "5ℤ -ℤ 0ℤ" `shouldReturn` pure (Just $ makeInteger 5)
 
+  it "should evaluate biversal monads" $ do
+    r "→ℕℤ 5ℕ" `shouldReturn` pure (Just $ makeInteger 5)
+    r "→ℤℕ 5ℤ" `shouldReturn` pure (Just $ makeNatural 5)
+
   it "should evaluate numeric literals" $ do
     r "12ℕ" `shouldReturn` pure (Just $ makeNatural 12)
     r "¯5ℤ" `shouldReturn` pure (Just $ makeInteger (-5))

@@ -47,6 +47,9 @@ spec = do
       pe "∅ ×𝕒 ∅" `shouldReturn` pure (ExprUniversalDyad '×' '𝕒' ExprEmptySet ExprEmptySet)
       pe "∅ -𝕒 ∅" `shouldReturn` pure (ExprUniversalDyad '-' '𝕒' ExprEmptySet ExprEmptySet)
 
+    it "should parse biversal operators" $ do
+      pe "→𝕒𝕓 ∅" `shouldReturn` pure (ExprBiversalMonad '→' '𝕒' '𝕓' ExprEmptySet)
+
     it "should parse number literals" $ do
       pe "1234𝕒" `shouldReturn` pure (ExprNumeric 1234 '𝕒')
       pe "0𝕒" `shouldReturn` pure (ExprNumeric 0 '𝕒')
