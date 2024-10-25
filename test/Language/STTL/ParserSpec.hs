@@ -49,6 +49,7 @@ spec = do
 
     it "should parse biversal operators" $ do
       pe "→𝕒𝕓 ∅" `shouldReturn` pure (ExprBiversalMonad '→' '𝕒' '𝕓' ExprEmptySet)
+      pe "↣𝕒𝕓 ∅" `shouldReturn` pure (ExprBiversalMonad '↣' '𝕒' '𝕓' ExprEmptySet)
 
     it "should parse number literals" $ do
       pe "1234𝕒" `shouldReturn` pure (ExprNumeric 1234 '𝕒')

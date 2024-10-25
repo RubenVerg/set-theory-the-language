@@ -12,7 +12,7 @@ Also available is `;` for creating pairs and `get`, which reads a set from stdin
 
 Number literals also work with universes: `3ℕ` creates the natural 3 and `¯2ℤ` the integer -2.
 
-Biverses also exist: these describe relations between two universes. `→` converts between universes: `→ℕℤ` converts naturals to integers, and `→ℤℕ` converts integers to naturals (where possible).
+Biverses also exist: these describe relations between two universes. `→` converts between universes: `→ℕℤ` converts naturals to integers, and `→ℤℕ` converts integers to naturals (where possible). `↣` also converts between universes, but "injects", i.e. tries to be total. If `↣𝕦𝕧` and `↣𝕧𝕦` are both defined, they create a bijection between `𝕦` and `𝕧`.
 
 What is described so far are expressions. While expressions can constitute statements of their own, there are two more statements: `print` statements, which print the expression as a set, and `print𝕦`, which print in the context of the universe `𝕦`, where applicable.
 

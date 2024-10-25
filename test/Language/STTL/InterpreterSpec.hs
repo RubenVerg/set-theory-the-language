@@ -47,6 +47,8 @@ spec = do
   it "should evaluate biversal monads" $ do
     r "→ℕℤ 5ℕ" `shouldReturn` pure (Just $ makeInteger 5)
     r "→ℤℕ 5ℤ" `shouldReturn` pure (Just $ makeNatural 5)
+    r "↣ℕℤ 5ℕ" `shouldReturn` pure (Just $ makeInteger (-3))
+    r "↣ℤℕ 5ℤ" `shouldReturn` pure (Just $ makeNatural 10)
 
   it "should evaluate numeric literals" $ do
     r "12ℕ" `shouldReturn` pure (Just $ makeNatural 12)
