@@ -28,10 +28,12 @@ constants =
 
 count = '#'
 convert = '→'
+inject = '↣'
 
 monads =
   [ count
   , convert
+  , inject
   ]
 
 union = '∪'

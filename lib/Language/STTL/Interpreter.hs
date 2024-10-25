@@ -82,6 +82,7 @@ interpretExpr (ExprBiversalMonad c u v x) = withBiverse (u, v) $ \un -> let
     f x'
   in case c of
     _ | c == G.convert -> evalOrNot $ biverseConvert un
+    _ | c == G.inject -> evalOrNot $ biverseInject un
     _ -> throwError $ "Unknown operator " ++ [c] ++ " in biverse " ++ [u, v]
 
 -- | Interpret a 'Stmt'.

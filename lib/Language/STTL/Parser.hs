@@ -90,7 +90,7 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   , [ dyadL G.cartesianProduct ]
   , [ dyadN G.subset, dyadN G.superset, dyadN G.element, dyadN G.contains ]
   , [ dyadN G.pair ]
-  , [ monadUUL G.convert ]
+  , [ monadUUL G.convert, monadUUL G.inject ]
   ]
   where
     monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> ExprMonad c)

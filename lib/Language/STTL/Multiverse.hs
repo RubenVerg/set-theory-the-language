@@ -25,4 +25,5 @@ data Universe = Universe
 data Biverse = Biverse
   { biverseChars :: (Char, Char)
   , biverseConvert :: Maybe (Set -> Context Set)
+  , biverseInject :: Maybe (Set -> Context Set)
   }
