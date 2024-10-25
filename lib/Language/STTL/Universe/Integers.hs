@@ -17,7 +17,7 @@ import qualified Language.STTL.Glyphs as G
 import Language.STTL.Context
 import Language.STTL.Set
 import Language.STTL.Constructs
-import Language.STTL.Universe
+import Language.STTL.Multiverse
 
 import Text.Read
 import Numeric.Natural

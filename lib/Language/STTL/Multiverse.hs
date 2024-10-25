@@ -1,9 +1,10 @@
 -- |
--- Module: Language.STTL.Univere
+-- Module: Language.STTL.Multiverse
 --
--- Defines @Universe@s, contexts in which operations are performed.
-module Language.STTL.Universe
+-- Defines @Universe@s, contexts in which operations are performed, and @Biverse@s, contexts in which operations that relate to two universes are performed.
+module Language.STTL.Multiverse
   ( Universe(..)
+  , Biverse(..)
   ) where
 
 import Language.STTL.Set
@@ -18,4 +19,10 @@ data Universe = Universe
   , universePlus :: Maybe (Set -> Set -> Context Set) -- ^ Addition in this universe.
   , universeMinus :: Maybe (Set -> Set -> Context Set) -- ^ Subtraction in this universe.
   , universeTimes :: Maybe (Set -> Set -> Context Set) -- ^ Multiplication in this universe.
+  }
+
+-- | Collection of operations in two contexts.
+data Biverse = Biverse
+  { biverseChars :: (Char, Char)
+  , biverseConvert :: Maybe (Set -> Context Set)
   }

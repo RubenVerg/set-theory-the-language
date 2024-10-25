@@ -27,9 +27,11 @@ constants =
   ]
 
 count = '#'
+convert = '→'
 
 monads =
   [ count
+  , convert
   ]
 
 union = '∪'

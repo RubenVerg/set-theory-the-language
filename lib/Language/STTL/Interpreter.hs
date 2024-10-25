@@ -12,7 +12,7 @@ import qualified Language.STTL.Glyphs as G
 import Language.STTL.Parser
 import Language.STTL.Set
 import Language.STTL.Constructs
-import Language.STTL.Universe
+import Language.STTL.Multiverse
 import Language.STTL.DefaultUniverses
 import Language.STTL.Context
 
@@ -23,6 +23,11 @@ import System.IO
 withUniverse :: Char -> (Universe -> Context a) -> Context a
 withUniverse u f = case lookup u universes of
   Nothing -> throwError $ "Universe " ++ [u] ++ " does not exist"
+  Just un -> f un
+
+withBiverse :: (Char, Char) -> (Biverse -> Context a) -> Context a
+withBiverse (u, v) f = case lookup (u, v) biverses of
+  Nothing -> throwError $ "Biverse " ++ [u, v] ++ " does not exist"
   Just un -> f un
 
 -- | Interpret an 'Expr'.
@@ -70,6 +75,14 @@ interpretExpr (ExprUniversalDyad c u x y) = withUniverse u $ \un -> let
     _ | c == G.minus -> evalOrNot $ universeMinus un
     _ | c == G.cartesianProduct -> evalOrNot $ universeTimes un
     _ -> throwError $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
+interpretExpr (ExprBiversalMonad c u v x) = withBiverse (u, v) $ \un -> let
+  evalOrNot Nothing = throwError $ "Biverse " ++ [u, v] ++ " does not support operation " ++ [c]
+  evalOrNot (Just f) = do
+    x' <- interpretExpr x
+    f x'
+  in case c of
+    _ | c == G.convert -> evalOrNot $ biverseConvert un
+    _ -> throwError $ "Unknown operator " ++ [c] ++ " in biverse " ++ [u, v]
 
 -- | Interpret a 'Stmt'.
 interpret :: Stmt -> Context (Maybe Set)

@@ -14,7 +14,7 @@ module Language.STTL.Universe.Naturals
 
 import Language.STTL.Constructs
 import Language.STTL.Set
-import Language.STTL.Universe
+import Language.STTL.Multiverse
 import Language.STTL.Context
 
 import Text.Read

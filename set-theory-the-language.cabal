@@ -65,11 +65,12 @@ library
                     , Language.STTL.DefaultUniverses
                     , Language.STTL.Glyphs
                     , Language.STTL.Interpreter
+                    , Language.STTL.Multiverse
                     , Language.STTL.Parser
                     , Language.STTL.Set
-                    , Language.STTL.Universe
                     , Language.STTL.Universe.Integers
                     , Language.STTL.Universe.Naturals
+                    , Language.STTL.Biverse.NaturalsIntegers
 
     -- Modules included in this library but not exported.
     -- other-modules:

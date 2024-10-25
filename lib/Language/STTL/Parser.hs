@@ -21,17 +21,20 @@ import Data.Bifunctor
 import Control.Monad.Combinators.Expr
 import Data.Composition
 
+type UniverseId = Char
+
 -- | Expression abstract syntax tree.
 data Expr
   = ExprEmptySet
-  | ExprNumeric Integer Char
+  | ExprNumeric Integer UniverseId
   | ExprGet
-  | ExprUniversalGet Char
+  | ExprUniversalGet UniverseId
   | ExprSetLiteral [Expr]
   | ExprMonad Char Expr
   | ExprDyad Char Expr Expr
-  | ExprUniversalMonad Char Char Expr
-  | ExprUniversalDyad Char Char Expr Expr
+  | ExprUniversalMonad Char UniverseId Expr
+  | ExprUniversalDyad Char UniverseId Expr Expr
+  | ExprBiversalMonad Char UniverseId UniverseId Expr
   deriving (Eq, Show)
 
 -- | Statement abstract syntax tree.
@@ -87,12 +90,14 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   , [ dyadL G.cartesianProduct ]
   , [ dyadN G.subset, dyadN G.superset, dyadN G.element, dyadN G.contains ]
   , [ dyadN G.pair ]
+  , [ monadUUL G.convert ]
   ]
   where
     monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> ExprMonad c)
     dyadL c = InfixL $ lexeme $ char c $> ExprDyad c
     dyadN c = InfixN $ lexeme $ char c $> ExprDyad c
     dyadUL c = InfixL $ lexeme $ (commitOn ExprUniversalDyad (char c) universe <?> [c] ++ "𝕦")
+    monadUUL c = Prefix $ foldr1 (.) <$> some (lexeme $ (commitOn (\_ (u, v) -> ExprBiversalMonad c u v) (char c) (commitOn (,) universe universe) <?> [c] ++ "𝕦𝕧"))
 
 universalPrintStatement :: Parser Stmt
 universalPrintStatement = lexeme (commitOn (StmtUniversalPrint .: flip const) (string "print") universe <*> expression <?> "print𝕦")
