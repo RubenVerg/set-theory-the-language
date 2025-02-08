@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 module Language.STTL.InterpreterSpec where
 
 import Test.Hspec
@@ -19,7 +20,7 @@ spec = do
     r "∅" `shouldReturn` pure (Just emptySet)
 
   it "should evaluate set literals" $ do
-    r "{∅}" `shouldReturn` pure (Just $ makeSet [emptySet])
+    r "{∅}" `shouldReturn` pure (Just [emptySet])
 
   it "should evaluate monads" $ do
     r "#∅" `shouldReturn` pure (Just $ makeNatural 0)

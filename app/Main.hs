@@ -35,17 +35,19 @@ showWithFlags flags set = let
         Just f -> f set
 
 repl :: [String] -> IO ()
-repl flags = do
-  putStr "> "
-  hFlush stdout
-  line <- getLine
-  if line == ":q" then return ()
-  else runContext (run "<repl>" line) >>= (\case
-    Left err -> putStrLn err
-    Right Nothing -> return ()
-    Right (Just v) -> runContext (showWithFlags flags v) >>= (\case
+repl flags = let
+  go = do
+    putStr "> "
+    hFlush stdout
+    line <- getLine
+    if line == ":q" then return ()
+    else runContext (run "<repl>" line) >>= (\case
       Left err -> putStrLn err
-      Right str -> putStrLn str)) >> repl flags
+      Right Nothing -> return ()
+      Right (Just v) -> runContext (showWithFlags flags v) >>= (\case
+        Left err -> putStrLn err
+        Right str -> putStrLn str)) >> go
+  in putStrLn "Set Theory: The Language REPL; :q to exit." >> go
 
 runFile :: [String] -> FilePath -> [String] -> IO ()
 runFile flags file args = do
@@ -63,7 +65,6 @@ runFile flags file args = do
 
 main :: IO ()
 main = do
-  hSetEncoding stdin utf8
   hSetEncoding stdout utf8
   hSetEncoding stderr utf8
 

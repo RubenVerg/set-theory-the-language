@@ -36,7 +36,7 @@ interpretExpr ExprEmptySet = pure emptySet
 interpretExpr (ExprNumeric n u) = withUniverse u $ \un -> case universeParseNumeric un of
   Nothing -> throwError $ "Universe " ++ [u] ++ " does not support numeric literals"
   Just f -> f n
-interpretExpr (ExprSetLiteral xs) = makeSet <$> mapM interpretExpr xs
+interpretExpr (ExprSetLiteral xs) = Set <$> mapM interpretExpr xs
 interpretExpr ExprGet = do
   liftIO $ putStr "input> "
   liftIO $ hFlush stdout

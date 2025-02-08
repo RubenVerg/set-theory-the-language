@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 module Language.STTL.SetSpec where
 
 import Test.Hspec
@@ -9,11 +10,11 @@ spec :: Spec
 spec = do
   describe "makeSet" $ do
     it "should remove duplicates" $ do
-      unSet (makeSet [emptySet, emptySet]) `shouldBe` unSet (makeSet [emptySet])
+      unSet [[], []] `shouldBe` unSet [[]]
   
   describe "unSet" $ do
     it "should return contents sorted" $ do
-      unSet (makeSet [setSingleton emptySet, emptySet]) `shouldBe` [emptySet, setSingleton emptySet]
+      unSet [[[]], []] `shouldBe` [[], [[]]]
 
   describe "emptySet" $ do
     it "should contain no elements" $ do
@@ -25,85 +26,82 @@ spec = do
 
   describe "setCount" $ do
     it "should return the number of elements in a set" $ do
-      setCount emptySet `shouldBe` 0
-      setCount (setSingleton emptySet) `shouldBe` 1
-      setCount (makeSet [emptySet, setSingleton emptySet]) `shouldBe` 2
+      setCount [] `shouldBe` 0
+      setCount [[]] `shouldBe` 1
+      setCount [[], [[]]] `shouldBe` 2
 
   describe "setUnion" $ do
     it "should return the union of two sets" $ do
-      setUnion emptySet emptySet `shouldBe` emptySet
-      setUnion emptySet (setSingleton emptySet) `shouldBe` setSingleton emptySet
-      setUnion (setSingleton emptySet) (setSingleton emptySet) `shouldBe` setSingleton emptySet
-      setUnion (makeSet [emptySet, setSingleton emptySet]) (makeSet [emptySet, setSingleton (setSingleton emptySet)])
-        `shouldBe` makeSet [emptySet, setSingleton emptySet, setSingleton (setSingleton emptySet)]
+      setUnion [] [] `shouldBe` []
+      setUnion [] [[]] `shouldBe` [[]]
+      setUnion [[]] [[]] `shouldBe` [[]]
+      setUnion [[], [[]]] [[], [[[]]]] `shouldBe` [[], [[]], [[[]]]]
   
   describe "setIntersection" $ do
     it "should return the intersection of two sets" $ do
-      setIntersection emptySet emptySet `shouldBe` emptySet
-      setIntersection emptySet (setSingleton emptySet) `shouldBe` emptySet
-      setIntersection (setSingleton emptySet) (setSingleton emptySet) `shouldBe` setSingleton emptySet
-      setIntersection (makeSet [emptySet, setSingleton emptySet]) (makeSet [emptySet, setSingleton (setSingleton emptySet)])
-        `shouldBe` makeSet [emptySet]
+      setIntersection [] [] `shouldBe` []
+      setIntersection [] [[]] `shouldBe` []
+      setIntersection [[]] [[]] `shouldBe` [[]]
+      setIntersection [[], [[]]] [[], [[[]]]] `shouldBe` [[]]
 
   describe "setDifference" $ do
     it "should return the difference of two sets" $ do
-      setDifference emptySet emptySet `shouldBe` emptySet
-      setDifference emptySet (setSingleton emptySet) `shouldBe` emptySet
-      setDifference (setSingleton emptySet) (setSingleton emptySet) `shouldBe` emptySet
-      setDifference (setSingleton emptySet) emptySet `shouldBe` setSingleton emptySet
-      setDifference (makeSet [emptySet, setSingleton emptySet]) (makeSet [emptySet, setSingleton (setSingleton emptySet)])
-        `shouldBe` makeSet [setSingleton emptySet]
+      setDifference [] [] `shouldBe` []
+      setDifference [] [[]] `shouldBe` []
+      setDifference [[]] [[]] `shouldBe` []
+      setDifference [[]] [] `shouldBe` [[]]
+      setDifference [[], [[]]] [[], [[[]]]] `shouldBe` [[[]]]
 
   describe "setSubset" $ do
     it "should check whether a set is a subset of another" $ do
-      setSubset (setSingleton emptySet) (makeNatural 5) `shouldBe` True
-      setSubset (setSingleton emptySet) emptySet `shouldBe` False
+      setSubset [[]] (makeNatural 5) `shouldBe` True
+      setSubset [[]] [] `shouldBe` False
     it "should say that the empty set is a subset of all sets" $ do
-      setSubset emptySet (makeNatural 5) `shouldBe` True
+      setSubset [] (makeNatural 5) `shouldBe` True
 
   describe "setSuperset" $ do
     it "should check whether a set is a superset of another" $ do
-      setSuperset (makeNatural 5) (setSingleton emptySet) `shouldBe` True
-      setSuperset emptySet (setSingleton emptySet) `shouldBe` False
+      setSuperset (makeNatural 5) [[]] `shouldBe` True
+      setSuperset [] [[]] `shouldBe` False
     it "should say that all sets are supersets of the empty set" $ do
-      setSuperset (makeNatural 5) emptySet `shouldBe` True
+      setSuperset (makeNatural 5) [] `shouldBe` True
 
   describe "setElement" $ do
     it "should check whether a set contains an element" $ do
-      setElement (setSingleton emptySet) emptySet `shouldBe` False
-      setElement (setSingleton emptySet) (makeNatural 5) `shouldBe` True
+      setElement [[]] [] `shouldBe` False
+      setElement [[]] (makeNatural 5) `shouldBe` True
 
   describe "setContains" $ do
     it "should check whether a set contains another" $ do
-      setContains emptySet (setSingleton emptySet) `shouldBe` False
-      setContains (makeNatural 5) (setSingleton emptySet) `shouldBe` True
+      setContains [] [[]] `shouldBe` False
+      setContains (makeNatural 5) [[]] `shouldBe` True
 
   describe "instance Eq Set" $ do
     it "should compare equal sets equal" $ do
-      setSingleton emptySet `shouldBe` setSingleton emptySet
-      emptySet `shouldBe` emptySet
-      makeSet [emptySet, setSingleton emptySet] `shouldBe` makeSet [emptySet, setSingleton emptySet]
-      makeSet [setSingleton emptySet, emptySet] `shouldBe` makeSet [emptySet, setSingleton emptySet]
+      Set [[]] `shouldBe` Set [[]]
+      Set [] `shouldBe` Set []
+      Set [[], [[]]] `shouldBe` Set [[], [[]]]
+      Set [[[]], []] `shouldBe` Set [[], [[]]]
     it "should compare different sets unequal" $ do
-      emptySet `shouldNotBe` setSingleton emptySet
+      Set [] `shouldNotBe` Set [[]]
 
   describe "instance Ord Set" $ do
     it "should return EQ for equal sets" $ do
-      emptySet `compare` emptySet `shouldBe` EQ
-      makeSet [emptySet, setSingleton emptySet] `compare` makeSet [emptySet, setSingleton emptySet] `shouldBe` EQ
-      makeSet [setSingleton emptySet, emptySet] `compare` makeSet [emptySet, setSingleton emptySet] `shouldBe` EQ
+      Set [] `compare` Set [] `shouldBe` EQ
+      Set [[], [[]]] `compare` Set [[], [[]]] `shouldBe` EQ
+      Set [[[]], []] `compare` Set [[], [[]]] `shouldBe` EQ
     it "should compare different sets lexicographically" $ do
-      emptySet `compare` setSingleton emptySet `shouldBe` LT
-      setSingleton emptySet `compare` emptySet `shouldBe` GT
-      makeSet [emptySet, setSingleton emptySet] `compare` makeSet [emptySet] `shouldBe` GT
-      makeSet [emptySet, setSingleton emptySet] `compare` makeSet [setSingleton emptySet] `shouldBe` LT
+      Set [] `compare` Set [[]] `shouldBe` LT
+      Set [[]] `compare` Set [] `shouldBe` GT
+      Set [[], [[]]] `compare` Set [[]] `shouldBe` GT
+      Set [[], [[]]] `compare` Set [[[]]] `shouldBe` LT
 
   describe "instance Show Set" $ do
     it "should show the empty set" $ do
       show emptySet `shouldBe` "∅"
     it "should show a singleton set" $ do
-      show (setSingleton emptySet) `shouldBe` "{∅}"
+      show (Set [emptySet]) `shouldBe` "{∅}"
     it "should show a set with multiple elements" $ do
-      show (makeSet [emptySet, setSingleton emptySet]) `shouldBe` "{∅, {∅}}"
+      show (Set [emptySet, [emptySet]]) `shouldBe` "{∅, {∅}}"
     
   

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 -- |
 -- Module: Language.STTL.Constructs
 --
@@ -45,17 +46,20 @@ import Language.STTL.Set
 import Data.List
 import Control.Monad
 import Numeric.Natural
+import qualified Data.Set as Set
 
 -- | Construct a 'Set' pair from a Haskell pair.
 makePair :: (Set, Set) -> Set
-makePair (a, b) = makeSet [makeSet [a], makeSet [a, b]]
+makePair (a, b) = [[a], [a, b]]
 
 -- | Extract the contents of a pair.
 unPair :: Set -> Maybe (Set, Set)
-unPair s = if setCount s `notElem` [1, 2] then Nothing else if setCount s == 1 then do
-  [[v]] <- pure $ unSet <$> unSet s
-  return (v, v)
-  else if fmap setCount (unSet s) `notElem` [[1, 2], [2, 1]] then Nothing else do
+unPair s =
+  if setCount s `notElem` ([1, 2] :: [Natural]) then Nothing
+  else if setCount s == 1 then do
+    [[v]] <- pure s
+    return (v, v)
+  else if fmap setCount (unSet s) `notElem` ([[1, 2], [2, 1]] :: [[Natural]]) then Nothing else do
   [[f], [s1, s2]] <- pure $ unSet <$> (sortOn setCount $ unSet s)
   if f == s1 then return (s1, s2) else if f == s2 then return (s2, s1) else mzero
 
@@ -75,10 +79,7 @@ pairSnd = fmap snd . unPair
 --
 -- \[ A \times B = \{ (a, b) | a \in A, b \in B \} \]
 cartesianProduct :: Set -> Set -> Set
-cartesianProduct x y = let (xs, ys) = (unSet x, unSet y) in makeSet $ do
-  x' <- xs
-  y' <- ys
-  pure $ makePair (x', y')
+cartesianProduct (Set' x) (Set' y) = Set' $ Set.map makePair $ Set.cartesianProduct x y
 
 -- | Construct a 'Set' natural number from a 'Natural'.
 makeNatural :: Natural -> Set
@@ -96,7 +97,7 @@ naturalZero = emptySet
 
 -- | The natural representing \(n + 1\).
 naturalSucc :: Set -> Set
-naturalSucc n = setUnion n $ setSingleton n
+naturalSucc n = setUnion n [n]
 
 -- | Construct a 'Set' integer from an 'Integer'.
 makeInteger :: Integer -> Set
@@ -117,12 +118,12 @@ makeBoolean True = booleanTrue
 
 -- | Convert empty sets to @False@ and everything else to @True@.
 unBoolean :: Set -> Bool
-unBoolean s = if s == emptySet then False else True
+unBoolean s = if s == booleanFalse then False else True
 
 -- | The boolean representing @False@.
 booleanFalse :: Set
-booleanFalse = emptySet
+booleanFalse = []
 
 -- | The boolean representing @True@.
 booleanTrue :: Set
-booleanTrue = setSingleton emptySet
+booleanTrue = [[]]
