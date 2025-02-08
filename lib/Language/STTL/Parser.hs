@@ -81,7 +81,7 @@ term = emptySet <|> setLiteral <|> numericLiteral <|> universalGet <|> get <|> b
 
 expression :: Parser Expr
 expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
-  [ [ monad G.count ]
+  [ [ monads [ monad G.count, monadUL G.negation ] ]
   , [ dyadUL G.cartesianProduct ]
   , [ dyadUL G.plus, dyadUL G.minus ]
   , [ dyadL G.difference ]
@@ -90,14 +90,16 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   , [ dyadL G.cartesianProduct ]
   , [ dyadN G.subset, dyadN G.superset, dyadN G.element, dyadN G.contains ]
   , [ dyadN G.pair ]
-  , [ monadUUL G.convert, monadUUL G.inject ]
+  , [ monads [ monadUUL G.convert, monadUUL G.inject ] ]
   ]
   where
-    monad c = Prefix $ foldr1 (.) <$> some (lexeme $ char c $> ExprMonad c)
+    monad c = lexeme $ char c $> ExprMonad c
     dyadL c = InfixL $ lexeme $ char c $> ExprDyad c
     dyadN c = InfixN $ lexeme $ char c $> ExprDyad c
     dyadUL c = InfixL $ lexeme $ (commitOn ExprUniversalDyad (char c) universe <?> [c] ++ "𝕦")
-    monadUUL c = Prefix $ foldr1 (.) <$> some (lexeme $ (commitOn (\_ (u, v) -> ExprBiversalMonad c u v) (char c) (commitOn (,) universe universe) <?> [c] ++ "𝕦𝕧"))
+    monadUL c = lexeme $ (commitOn ExprUniversalMonad (char c) universe <?> [c] ++ "𝕦")
+    monadUUL c = lexeme $ (commitOn (\_ (u, v) -> ExprBiversalMonad c u v) (char c) (commitOn (,) universe universe) <?> [c] ++ "𝕦𝕧")
+    monads cs = Prefix $ foldr1 (.) <$> some (choice cs)
 
 universalPrintStatement :: Parser Stmt
 universalPrintStatement = lexeme (commitOn (StmtUniversalPrint .: flip const) (string "print") universe <*> expression <?> "print𝕦")

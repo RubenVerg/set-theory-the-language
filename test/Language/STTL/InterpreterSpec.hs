@@ -27,18 +27,19 @@ spec = do
     r "#{∅}" `shouldReturn` pure (Just $ makeNatural 1)
 
   it "should evaluate dyads" $ do
-    r "{∅} ∪ ∅" `shouldReturn` pure (Just $ setSingleton emptySet)
-    r "{∅} ∩ ∅" `shouldReturn` pure (Just emptySet)
-    r "{∅} ∖ ∅" `shouldReturn` pure (Just $ setSingleton emptySet)
-    r "{∅} × {∅}" `shouldReturn` pure (Just $ setSingleton $ makePair (emptySet, emptySet))
+    r "{∅} ∪ ∅" `shouldReturn` pure (Just [[]])
+    r "{∅} ∩ ∅" `shouldReturn` pure (Just [])
+    r "{∅} ∖ ∅" `shouldReturn` pure (Just [[]])
+    r "{∅} × {∅}" `shouldReturn` pure (Just [makePair ([], [])])
     r "∅ ⊆ {∅}" `shouldReturn` pure (Just booleanTrue)
     r "∅ ⊇ {∅}" `shouldReturn` pure (Just booleanFalse)
     r "∅ ∈ {∅}" `shouldReturn` pure (Just booleanTrue)
     r "∅ ∋ {∅}" `shouldReturn` pure (Just booleanFalse)
-    r "∅ ; {∅}" `shouldReturn` pure (Just $ makePair (emptySet, setSingleton emptySet))
+    r "∅ ; {∅}" `shouldReturn` pure (Just $ makePair ([], [[]]))
 
   it "should evaluate universal monads" $ do
-    True `shouldBe` True
+    r "-ℤ 3ℤ" `shouldReturn` pure (Just $ makeInteger (-3))
+    r "-ℤ ¯4ℤ" `shouldReturn` pure (Just $ makeInteger 4)
 
   it "should evaluate universal dyads" $ do
     r "∅ +ℕ {∅}" `shouldReturn` pure (Just $ makeNatural 1)

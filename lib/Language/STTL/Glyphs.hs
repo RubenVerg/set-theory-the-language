@@ -29,11 +29,13 @@ constants =
 count = '#'
 convert = '→'
 inject = '↣'
+negation = '-'
 
 monads =
   [ count
   , convert
   , inject
+  , negation
   ]
 
 union = '∪'

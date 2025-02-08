@@ -63,7 +63,14 @@ interpretExpr (ExprDyad c x y)
   | c == G.contains = makeBoolean .: setContains <$> interpretExpr x <*> interpretExpr y
   | c == G.pair = curry makePair <$> interpretExpr x <*> interpretExpr y
   | otherwise = throwError $ "Unknown operator " ++ [c]
-interpretExpr (ExprUniversalMonad c u _) = throwError $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
+interpretExpr (ExprUniversalMonad c u x) = withUniverse u $ \un -> let
+  evalOrNot Nothing = throwError $ "Universe " ++ [u] ++ " does not support operation " ++ [c]
+  evalOrNot (Just f) = do
+    x' <- interpretExpr x
+    f x'
+  in case c of
+    _ | c == G.negation -> evalOrNot $ universeNegation un
+    _ -> throwError $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
 interpretExpr (ExprUniversalDyad c u x y) = withUniverse u $ \un -> let
   evalOrNot Nothing = throwError $ "Universe " ++ [u] ++ " does not support operation " ++ [c]
   evalOrNot (Just f) = do

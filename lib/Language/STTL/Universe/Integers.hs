@@ -68,6 +68,9 @@ integersTimes a b = do
   (bp, bn) <- up b
   pure $ makePair (makeNatural $ ap * bp + an * bn, makeNatural $ ap * bn + an * bp)
 
+integersNegation :: Set -> Context Set
+integersNegation = integersMinus (makeInteger 0)
+
 integers :: Universe
 integers = Universe
   { universeChar = integersChar
@@ -76,4 +79,6 @@ integers = Universe
   , universeRead = Just integersRead
   , universePlus = Just integersPlus
   , universeMinus = Just integersMinus
-  , universeTimes = Just integersTimes }
+  , universeTimes = Just integersTimes
+  , universeNegation = Just integersNegation
+  }

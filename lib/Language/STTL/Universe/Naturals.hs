@@ -58,4 +58,6 @@ naturals = Universe
   , universeRead = Just naturalsRead
   , universePlus = Just naturalsPlus
   , universeMinus = Nothing
-  , universeTimes = Just naturalsTimes }
+  , universeTimes = Just naturalsTimes
+  , universeNegation = Nothing
+  }

@@ -38,11 +38,14 @@ spec = do
 
     it "should allow double monads" $ do
       pe "##∅" `shouldReturn` pure (ExprMonad '#' (ExprMonad '#' ExprEmptySet))
+      pe "-𝕒#∅" `shouldReturn` pure (ExprUniversalMonad '-' '𝕒' (ExprMonad '#' ExprEmptySet))
+      pe "#-𝕒∅" `shouldReturn` pure (ExprMonad '#' (ExprUniversalMonad '-' '𝕒' ExprEmptySet))
 
     it "should parse parentheses" $ do
       pe "(∅)" `shouldReturn` pure ExprEmptySet
 
     it "should parse universal operators" $ do
+      pe "-𝕒 ∅" `shouldReturn` pure (ExprUniversalMonad '-' '𝕒' ExprEmptySet)
       pe "∅ +𝕒 ∅" `shouldReturn` pure (ExprUniversalDyad '+' '𝕒' ExprEmptySet ExprEmptySet)
       pe "∅ ×𝕒 ∅" `shouldReturn` pure (ExprUniversalDyad '×' '𝕒' ExprEmptySet ExprEmptySet)
       pe "∅ -𝕒 ∅" `shouldReturn` pure (ExprUniversalDyad '-' '𝕒' ExprEmptySet ExprEmptySet)
