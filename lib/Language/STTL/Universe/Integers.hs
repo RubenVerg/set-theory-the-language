@@ -81,4 +81,6 @@ integers = Universe
   , universeMinus = Just integersMinus
   , universeTimes = Just integersTimes
   , universeNegation = Just integersNegation
+  , universeUnion = Nothing
+  , universeIntersection = Nothing
   }

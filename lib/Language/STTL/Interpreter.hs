@@ -81,6 +81,8 @@ interpretExpr (ExprUniversalDyad c u x y) = withUniverse u $ \un -> let
     _ | c == G.plus -> evalOrNot $ universePlus un
     _ | c == G.minus -> evalOrNot $ universeMinus un
     _ | c == G.cartesianProduct -> evalOrNot $ universeTimes un
+    _ | c == G.union -> evalOrNot $ universeUnion un
+    _ | c == G.intersection -> evalOrNot $ universeIntersection un
     _ -> throwError $ "Unknown operator " ++ [c] ++ " in universe " ++ [u]
 interpretExpr (ExprBiversalMonad c u v x) = withBiverse (u, v) $ \un -> let
   evalOrNot Nothing = throwError $ "Biverse " ++ [u, v] ++ " does not support operation " ++ [c]

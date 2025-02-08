@@ -40,11 +40,14 @@ spec = do
   it "should evaluate universal monads" $ do
     r "-ℤ 3ℤ" `shouldReturn` pure (Just $ makeInteger (-3))
     r "-ℤ ¯4ℤ" `shouldReturn` pure (Just $ makeInteger 4)
+    r "-𝔹 ∅" `shouldReturn` pure (Just booleanTrue)
 
   it "should evaluate universal dyads" $ do
     r "∅ +ℕ {∅}" `shouldReturn` pure (Just $ makeNatural 1)
     r "{∅} ×ℕ {∅, {∅}}" `shouldReturn` pure (Just $ makeNatural 2)
     r "5ℤ -ℤ 0ℤ" `shouldReturn` pure (Just $ makeInteger 5)
+    r "∅ ∪𝔹 {∅}" `shouldReturn` pure (Just $ makeBoolean True)
+    r "∅ ∩𝔹 {∅}" `shouldReturn` pure (Just $ makeBoolean False)
 
   it "should evaluate biversal monads" $ do
     r "→ℕℤ 5ℕ" `shouldReturn` pure (Just $ makeInteger 5)

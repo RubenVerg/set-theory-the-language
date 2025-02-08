@@ -60,4 +60,6 @@ naturals = Universe
   , universeMinus = Nothing
   , universeTimes = Just naturalsTimes
   , universeNegation = Nothing
+  , universeUnion = Nothing
+  , universeIntersection = Nothing
   }

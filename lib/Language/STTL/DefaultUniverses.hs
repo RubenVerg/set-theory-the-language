@@ -8,6 +8,7 @@ module Language.STTL.DefaultUniverses
   ) where
 
 import Language.STTL.Multiverse
+import Language.STTL.Universe.Booleans
 import Language.STTL.Universe.Naturals
 import Language.STTL.Universe.Integers
 import Language.STTL.Biverse.NaturalsIntegers (naturalsIntegers, integersNaturals)
@@ -15,7 +16,8 @@ import Language.STTL.Biverse.NaturalsIntegers (naturalsIntegers, integersNatural
 -- | Map of universes.
 universes :: [(Char, Universe)]
 universes = (\x -> (universeChar x, x)) <$>
-  [ naturals
+  [ booleans
+  , naturals
   , integers
   ]
 

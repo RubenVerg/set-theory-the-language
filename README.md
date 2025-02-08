@@ -4,9 +4,9 @@
 
 In Set Theory: The Language (STTL), everything is a set. Natural numbers are encoded as sets, integers are, pairs are, booleans are, et cetera (okay, no "et cetera" yet, these are all the supported types)
 
-Along with basic set notation like `∅` for an empty set or `{el1, el2, el3}`, and set operations like `∪`, `∩`, `∖`, `×` (cartesian product), `⊆`, `⊇`, `∈`, `∋`, `#` (count), all other operations are provided by *universes*. To specify a suffix, you use a blackboard bold letter after a symbol. The currently supported universes are `ℕ` for natural numbers and `ℤ` for integers.
+Along with basic set notation like `∅` for an empty set or `{el1, el2, el3}`, and set operations like `∪`, `∩`, `∖`, `×` (cartesian product), `⊆`, `⊇`, `∈`, `∋`, `#` (count), all other operations are provided by *universes*. To specify a suffix, you use a blackboard bold letter after a symbol. The currently supported universes are `ℕ` for natural numbers, `ℤ` for integers, `𝔹` for booleans.
 
-The following operations support universes: `+`, `-`, `×`. Not all universes necessarily support all operations, for example there is no `-ℕ`.
+The following operations support universes: `+` (infix), `-` (prefix and infix), `×` (infix), `∪` (infix), `∩` (infix). Not all universes necessarily support all operations, for example there is no `-ℕ`.
 
 Also available is `;` for creating pairs and `get`, which reads a set from stdin, as well as `get𝕦` (where `𝕦` is a supported universe) for parsing inside the universe.
 

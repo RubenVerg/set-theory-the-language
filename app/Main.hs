@@ -40,7 +40,7 @@ repl flags = let
     putStr "> "
     hFlush stdout
     line <- getLine
-    if line == ":q" then return ()
+    if null line || line == ":q" then return ()
     else runContext (run "<repl>" line) >>= (\case
       Left err -> putStrLn err
       Right Nothing -> return ()

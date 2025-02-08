@@ -20,6 +20,8 @@ data Universe = Universe
   , universeMinus :: Maybe (Set -> Set -> Context Set) -- ^ Subtraction in this universe.
   , universeTimes :: Maybe (Set -> Set -> Context Set) -- ^ Multiplication in this universe.
   , universeNegation :: Maybe (Set -> Context Set) -- ^ Negation in this universe.
+  , universeUnion :: Maybe (Set -> Set -> Context Set) -- ^ Union in this universe.
+  , universeIntersection :: Maybe (Set -> Set -> Context Set) -- ^ Intersection in this universe.
   }
 
 -- | Collection of operations in two contexts.

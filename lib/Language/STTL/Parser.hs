@@ -65,10 +65,10 @@ setLiteral :: Parser Expr
 setLiteral = lexeme $ between (lexeme $ char G.setOpen) (lexeme $ char G.setClose) (ExprSetLiteral <$> sepBy expression (lexeme $ char G.elementSeparator))
 
 numericLiteral :: Parser Expr
-numericLiteral = lexeme (commitOn (ExprNumeric) (do
+numericLiteral = lexeme (commitOn ExprNumeric (do
   sign <- choice [char G.highMinus $> (-1), pure 1]
   digs <- some digitChar
-  pure $ sign * read digs) universe <?> "numeric literal")
+  pure $ sign * read digs) universe <?> "numericLiteral𝕦")
 
 universalGet :: Parser Expr
 universalGet = lexeme (commitOn (ExprUniversalGet .: flip const) (string "get") universe <?> "get𝕦")
@@ -84,6 +84,8 @@ expression = (*>) spaceConsumer $ lexeme $ makeExprParser term
   [ [ monads [ monad G.count, monadUL G.negation ] ]
   , [ dyadUL G.cartesianProduct ]
   , [ dyadUL G.plus, dyadUL G.minus ]
+  , [ dyadUL G.intersection ]
+  , [ dyadUL G.union ]
   , [ dyadL G.difference ]
   , [ dyadL G.intersection ]
   , [ dyadL G.union ]
