@@ -30,38 +30,42 @@ import Data.List
 import Numeric.Natural
 import qualified Data.Set as Set
 import Data.Hashable
-import qualified Data.Interned as I
+import Data.Interned
 import qualified GHC.IsList as IsL
 
--- | A mathematical set, a collection of unique sets.
-data InternedSet' = InternedSet' I.Id !(Set.Set Set)
-  deriving (Eq, Ord)
+data InternedSet' = IS' Id !(Set.Set Set)
+
+instance Eq InternedSet' where
+  (IS' a _) == (IS' b _) = a == b
 
 instance Hashable InternedSet' where
-  hashWithSalt s (InternedSet' i _) = hashWithSalt s i
+  hashWithSalt s (IS' i _) = hashWithSalt s i
 
-instance I.Interned InternedSet' where
+instance Interned InternedSet' where
   type Uninterned InternedSet' = Set.Set Set
-  newtype Description InternedSet' = InternedSet'Description (Set.Set Set) deriving (Eq, Hashable)
-  describe = InternedSet'Description
-  identify = InternedSet'
+  newtype Description InternedSet' = ISD (Set.Set Set) deriving (Eq, Hashable)
+  describe = ISD
+  identify = IS'
   cache = setCache
 
-instance I.Uninternable InternedSet' where
-  unintern (InternedSet' _ s) = s
+instance Uninternable InternedSet' where
+  unintern (IS' _ s) = s
 
+setCache :: Cache InternedSet'
+setCache = mkCache
 {-# NOINLINE setCache #-}
-setCache :: I.Cache InternedSet'
-setCache = I.mkCache
 
+-- | A mathematical set, a collection of unique sets.
 data Set = InternedSet !InternedSet'
-  deriving (Eq)
+
+instance Eq Set where
+  (InternedSet a) == (InternedSet b) = a == b
 
 instance Ord Set where
   compare (Set' a) (Set' b) = compare a b
 
 instance Hashable Set where
-  hashWithSalt s (InternedSet i) = hashWithSalt s i
+  hashWithSalt s (InternedSet set) = hashWithSalt s set
 
 instance IsL.IsList Set where
   type Item Set = Set
@@ -70,15 +74,15 @@ instance IsL.IsList Set where
 
 -- | The empty set \(\emptyset\).
 emptySet :: Set
-emptySet = InternedSet $ I.intern $ Set.empty
+emptySet = InternedSet $ intern Set.empty
 
 -- | A set containing just one element: \(\{x\}\).
 setSingleton :: Set -> Set
-setSingleton = InternedSet . I.intern . Set.singleton
+setSingleton = InternedSet . intern . Set.singleton
 
 -- | Turn a containers Set into a @Set@.
 makeSet' :: Set.Set Set -> Set
-makeSet' = InternedSet . I.intern
+makeSet' = InternedSet . intern
 
 -- | Turn a list into a @Set@.
 makeSet :: [Set] -> Set
@@ -86,11 +90,11 @@ makeSet = makeSet' . Set.fromList
 
 -- | Contents of a set, as a containers Set
 unSet' :: Set -> Set.Set Set
-unSet' (InternedSet int) = I.unintern int
+unSet' (InternedSet set) = unintern set
 
 -- | Contents of a set.
 unSet :: Set -> [Set]
-unSet = Set.toList . unSet'
+unSet = Set.toAscList . unSet'
 
 pattern Set' :: Set.Set Set -> Set
 pattern Set' xs <- (unSet' -> xs) where
@@ -109,7 +113,7 @@ instance Show Set where
 
 -- | The count, cardinality or length of a set, i.e. the amount of elements: \(\#s\).
 setCount :: Set -> Natural
-setCount (Set xs) = genericLength xs
+setCount (Set' xs) = fromIntegral $ Set.size xs
 
 -- | The union of two sets: a set containing all elements of both sets: \(a \cup b\).
 setUnion :: Set -> Set -> Set

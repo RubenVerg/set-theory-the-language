@@ -42,9 +42,8 @@ module Language.STTL.Constructs
   ) where
 
 import Language.STTL.Set
+import Language.STTL.Util
 
-import Data.List
-import Control.Monad
 import Numeric.Natural
 import qualified Data.Set as Set
 
@@ -54,14 +53,21 @@ makePair (a, b) = [[a], [a, b]]
 
 -- | Extract the contents of a pair.
 unPair :: Set -> Maybe (Set, Set)
-unPair s =
-  if setCount s `notElem` ([1, 2] :: [Natural]) then Nothing
-  else if setCount s == 1 then do
-    [[v]] <- pure s
-    return (v, v)
-  else if fmap setCount (unSet s) `notElem` ([[1, 2], [2, 1]] :: [[Natural]]) then Nothing else do
-  [[f], [s1, s2]] <- pure $ unSet <$> (sortOn setCount $ unSet s)
-  if f == s1 then return (s1, s2) else if f == s2 then return (s2, s1) else mzero
+unPair xs = case xs of
+  [s] -> do
+    [v] <- pure s
+    pure (v, v)
+  [a, b] -> case (setCount a, setCount b) of
+    (1, 2) -> do
+      [v'] <- pure a
+      [v, w] <- pure b
+      if v == v' then pure (v, w) else Nothing
+    (2, 1) -> do
+      [v'] <- pure b
+      [w, v] <- pure a
+      if v == v' then pure (v, w) else Nothing
+    _ -> Nothing
+  _ -> Nothing
 
 -- | Is the given set a pair?
 isPair :: Set -> Bool
@@ -97,7 +103,7 @@ naturalZero = emptySet
 
 -- | The natural representing \(n + 1\).
 naturalSucc :: Set -> Set
-naturalSucc n = setUnion n [n]
+naturalSucc s@(Set s') = Set' $ Set.fromAscList $ s' :> s
 
 -- | Construct a 'Set' integer from an 'Integer'.
 makeInteger :: Integer -> Set
